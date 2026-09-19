@@ -8,7 +8,7 @@ export function ProcessFigure() {
   return (
     <svg className="figure" viewBox="0 0 640 260" role="img" aria-labelledby={id}>
       <title id={id}>{t('figure.process.title')}</title>
-      <g fontSize="15" fontWeight="600" fill="currentColor">
+      <g fontSize="19" fontWeight="600" fill="currentColor">
         <text x="20" y="28">{t('figure.process.left')}</text>
         <text x="340" y="28">{t('figure.process.right')}</text>
       </g>
@@ -27,9 +27,9 @@ export function ProcessFigure() {
         <circle cx="220" cy="100" r="9" />
         <circle cx="280" cy="100" r="9" />
       </g>
-      <text x="20" y="180" fontSize="13" fill="currentColor" fillOpacity="0.75">{t('figure.process.leftSteps')}</text>
-      <rect x="20" y="196" width="112" height="24" rx="4" fill="var(--ds-background-element-dim-yellow-secondary, #fffab8)" />
-      <text x="76" y="213" fontSize="12" fontWeight="600" textAnchor="middle" fill="var(--ds-text-status-warning-primary, #9e6c00)">
+      <text x="20" y="182" fontSize="16" fill="currentColor" fillOpacity="0.75">{t('figure.process.leftSteps')}</text>
+      <rect x="20" y="196" width="132" height="28" rx="4" fill="var(--ds-background-element-dim-yellow-secondary, #fffab8)" />
+      <text x="86" y="215" fontSize="15" fontWeight="600" textAnchor="middle" fill="var(--ds-text-status-warning-primary, #9e6c00)">
         {t('figure.process.manual')}
       </text>
 
@@ -47,9 +47,9 @@ export function ProcessFigure() {
         <path d="M430 100h180" />
         <path d="M600 92l12 8-12 8" />
       </g>
-      <text x="340" y="180" fontSize="13" fill="currentColor" fillOpacity="0.75">{t('figure.process.rightSteps')}</text>
-      <rect x="340" y="196" width="112" height="24" rx="4" fill="var(--ds-background-element-dim-green-secondary, #e6f6eb)" />
-      <text x="396" y="213" fontSize="12" fontWeight="600" textAnchor="middle" fill="var(--ds-text-status-success-primary, #218358)">
+      <text x="340" y="182" fontSize="16" fill="currentColor" fillOpacity="0.75">{t('figure.process.rightSteps')}</text>
+      <rect x="340" y="196" width="132" height="28" rx="4" fill="var(--ds-background-element-dim-green-secondary, #e6f6eb)" />
+      <text x="406" y="215" fontSize="15" fontWeight="600" textAnchor="middle" fill="var(--ds-text-status-success-primary, #218358)">
         {t('figure.process.auto')}
       </text>
     </svg>
