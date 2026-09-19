@@ -1,0 +1,60 @@
+name: QA
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  qa:
+    name: Typecheck, Unit, E2E
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Versionsbump pruefen (kein Deploy ohne neue Version)
+        if: github.event_name == 'push'
+        run: |
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            prev=$(git show HEAD^:index.html | sed -n 's/.*class="app-version"[^>]*>\([^<]*\).*/\1/p' | head -n1)
+            cur=$(sed -n 's/.*class="app-version"[^>]*>\([^<]*\).*/\1/p' index.html | head -n1)
+            echo "Version vorher: '$prev' | jetzt: '$cur'"
+            if [ "$prev" = "$cur" ]; then
+              echo "::error::App-Version wurde nicht erhoeht ('$cur'). Bitte index.html bumpen (pre-commit Hook macht das automatisch)."
+              exit 1
+            fi
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit-Tests (Vitest)
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Playwright-Browser-Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-chromium-${{ runner.os }}-
+
+      - name: Playwright installieren
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E (Playwright)
+        run: npm run e2e

@@ -1,0 +1,2 @@
+# Git-Hooks muessen im Working Tree LF behalten (Shebang unter Git for Windows).
+.githooks/** text eol=lf
