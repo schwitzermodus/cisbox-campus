@@ -1,9 +1,16 @@
 /** Bewertungsstufen nach Prozent. Texte kommen aus i18n (rating.<tier>). */
 export type RatingTier = 'low' | 'solid' | 'good' | 'strong'
 
+/** Bestehensgrenze fuer den gruenen Haken auf der Kursuebersicht, deckungsgleich mit Stufe 'good'. */
+export const PASS_PERCENT = 75
+
+export function isPass(percent: number): boolean {
+  return percent >= PASS_PERCENT
+}
+
 export function ratingTier(percent: number): RatingTier {
   if (percent >= 90) return 'strong'
-  if (percent >= 75) return 'good'
+  if (percent >= PASS_PERCENT) return 'good'
   if (percent >= 50) return 'solid'
   return 'low'
 }

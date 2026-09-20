@@ -35,7 +35,7 @@ export function PrivacyScreen({ route }: { route: Route }) {
           {cleared ? t('privacy.cleared') : t('privacy.clearHint')}
         </p>
       </div>
-      <a className="btn btn-tertiary" href={hashFor({ locale: route.locale, screen: 'start' })}>
+      <a className="btn btn-tertiary" href={hashFor({ locale: route.locale, screen: 'courses' })}>
         {t('privacy.back')}
       </a>
     </article>

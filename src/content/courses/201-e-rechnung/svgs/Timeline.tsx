@@ -1,7 +1,7 @@
 import { useId } from 'react'
-import { useNarrow } from '../../../app/useNarrow'
-import { useI18n } from '../../../i18n/t'
-import type { MessageKey } from '../../../i18n/t'
+import { useNarrow } from '../../../../app/useNarrow'
+import { useI18n } from '../../../../i18n/t'
+import type { MessageKey } from '../../../../i18n/t'
 
 const BRAND = 'var(--ds-background-element-brand-primary, #215b33)'
 

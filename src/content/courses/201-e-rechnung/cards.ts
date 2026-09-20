@@ -1,13 +1,4 @@
-import type { LocalizedText } from '../../core/types'
-
-export type LearnCard = {
-  id: string
-  title: LocalizedText
-  /** Absaetze. Wortlaut unveraendert, nur in lesbare Bloecke geteilt. */
-  body: LocalizedText[]
-  /** Optionale Inline-Grafik (siehe svgs/). */
-  figure?: 'process' | 'formats' | 'timeline'
-}
+import type { LearnCard } from '../../types'
 
 /**
  * Lernkarten E-Rechnung, Schwierigkeit Basis. Quellsprache Deutsch.

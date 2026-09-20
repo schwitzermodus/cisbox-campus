@@ -2,7 +2,7 @@ import { ACTIVE_LOCALES } from '../core/types'
 import type { ActiveLocale } from '../core/types'
 import { useI18n } from '../i18n/t'
 import type { ThemePreference } from '../state/localHistory'
-import { hashFor } from '../app/router'
+import { hashFor, isCourseRoute, withLocale } from '../app/router'
 import type { Route } from '../app/router'
 
 type Props = {
@@ -18,16 +18,23 @@ export function Header({ route, themePref, onTheme }: Props) {
 
   const switchLocale = (locale: ActiveLocale) => {
     // Hash-Wechsel: kein Reload, Quiz-State bleibt (sessionStorage + React)
-    window.location.hash = hashFor({ ...route, locale })
+    window.location.hash = hashFor(withLocale(route, locale))
   }
 
   return (
     <header className="header">
       <div className="header-inner">
-        <a className="brand" href={hashFor({ locale: route.locale, screen: 'start' })} aria-label={t('header.home')}>
-          <img className="brand-mark" src={LOGO} alt="" width={28} height={28} />
-          <span className="brand-name">{t('app.title')}</span>
-        </a>
+        <div className="header-left">
+          <a className="brand" href={hashFor({ locale: route.locale, screen: 'courses' })} aria-label={t('header.home')}>
+            <img className="brand-mark" src={LOGO} alt="" width={28} height={28} />
+            <span className="brand-name">{t('app.title')}</span>
+          </a>
+          {isCourseRoute(route) ? (
+            <a className="header-back" href={hashFor({ locale: route.locale, screen: 'courses' })}>
+              {t('header.allCourses')}
+            </a>
+          ) : null}
+        </div>
         <div className="header-controls">
           <div className="seg" role="group" aria-label={t('header.language')}>
             {ACTIVE_LOCALES.map((l) => (

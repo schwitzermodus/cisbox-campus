@@ -6,14 +6,12 @@ export type ActiveLocale = (typeof ACTIVE_LOCALES)[number]
 
 export type LocalizedText = Partial<Record<Locale, string>> & { de: string }
 
-export type Topic = 'e-invoicing'
 export type Difficulty = 'basic' | 'intermediate' | 'advanced'
 
 export type Option = { id: string; label: LocalizedText }
 
 export type BaseQuestion = {
   id: string
-  topic: Topic
   difficulty: Difficulty
   prompt: LocalizedText
   explanation: LocalizedText

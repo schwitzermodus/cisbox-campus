@@ -13,8 +13,10 @@ export type CardData = {
   /** Unix ms des Versuchs (Datum auf der Karte) */
   at: number
   tier: RatingTier
-  topic: string
-  difficulty: string
+  /** Segmenttitel, z.B. "E-Rechnung" */
+  segment: string
+  /** Kurstitel, z.B. "Grundlagen" */
+  courseTitle: string
 }
 
 const FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
@@ -79,7 +81,7 @@ export async function renderResultCard(data: CardData, theme: CardTheme, i18n: I
   ctx.fillStyle = c.muted
   ctx.font = `500 26px ${FONT}`
   ctx.textBaseline = 'alphabetic'
-  ctx.fillText(t('card.topicLine', { topic: data.topic, difficulty: data.difficulty }), pad, 160)
+  ctx.fillText(t('card.topicLine', { segment: data.segment, course: data.courseTitle }), pad, 160)
 
   // Punkte gross
   ctx.fillStyle = c.brand

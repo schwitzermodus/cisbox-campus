@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { hashFor, navigate } from '../app/router'
-import type { Route } from '../app/router'
+import type { CourseRoute } from '../app/router'
 import { ResultCard } from '../components/ResultCard'
-import { DIFFICULTY, TOPIC } from '../content/e-invoicing/meta'
+import { segmentById } from '../content/registry'
+import type { Course } from '../content/types'
 import { ratingTier } from '../core/rating'
 import { scoreQuiz } from '../core/scoring'
 import { useI18n } from '../i18n/t'
@@ -10,7 +11,7 @@ import type { MessageKey } from '../i18n/t'
 import { answerState, describeAnswer } from '../result/describe'
 import { renderResultCard } from '../result/renderCard'
 import type { CardData } from '../result/renderCard'
-import { appendAttempt, updateHistory } from '../state/localHistory'
+import { recordAttempt, updateHistory } from '../state/localHistory'
 import type { ThemePreference } from '../state/localHistory'
 import { clearFinished, readFinished } from '../state/resultStore'
 import type { FinishedQuiz } from '../state/resultStore'
@@ -18,25 +19,26 @@ import { resolveTheme } from '../state/theme'
 
 const LOGO = import.meta.env.BASE_URL + 'logo/cisbox-o.svg'
 
-type Props = { route: Route; themePref: ThemePreference }
+type Props = { route: CourseRoute; course: Course; themePref: ThemePreference }
 
-export function ResultScreen({ route, themePref }: Props) {
+export function ResultScreen({ route, course, themePref }: Props) {
   const i18n = useI18n()
   const { t, lt, num, duration, date } = i18n
-  const [finished] = useState<FinishedQuiz | null>(() => readFinished())
+  const [finished] = useState<FinishedQuiz | null>(() => readFinished(course.id))
   const [imgUrl, setImgUrl] = useState<string | null>(null)
   const [blob, setBlob] = useState<Blob | null>(null)
   const [canShare, setCanShare] = useState(false)
   const recorded = useRef(false)
 
   useEffect(() => {
-    if (!finished) navigate({ locale: route.locale, screen: 'start' })
-  }, [finished, route.locale])
+    if (!finished) navigate({ locale: route.locale, screen: 'overview', courseId: course.id })
+  }, [finished, route.locale, course.id])
 
   const result = useMemo(() => (finished ? scoreQuiz(finished.questions, finished.answers) : null), [finished])
 
   const card: CardData | null = useMemo(() => {
     if (!finished || !result) return null
+    const segment = segmentById(course.segment)
     return {
       score: result.score,
       maxScore: result.maxScore,
@@ -44,10 +46,10 @@ export function ResultScreen({ route, themePref }: Props) {
       durationMs: finished.submittedAt - finished.startedAt,
       at: finished.submittedAt,
       tier: ratingTier(result.percent),
-      topic: t(('topic.' + TOPIC) as MessageKey),
-      difficulty: t(('difficulty.' + DIFFICULTY) as MessageKey),
+      segment: segment ? lt(segment.title) : course.segment,
+      courseTitle: lt(course.title),
     }
-  }, [finished, result, t])
+  }, [finished, result, course, lt])
 
   // Versuch genau einmal in den lokalen Verlauf schreiben (Schluessel: submittedAt)
   useEffect(() => {
@@ -56,17 +58,17 @@ export function ResultScreen({ route, themePref }: Props) {
     updateHistory((h) =>
       h.attempts.some((a) => a.at === finished.submittedAt)
         ? h
-        : appendAttempt(h, {
+        : recordAttempt(h, {
             at: finished.submittedAt,
-            topic: TOPIC,
-            difficulty: DIFFICULTY,
+            courseId: course.id,
+            difficulty: course.difficulty,
             score: result.score,
             maxScore: result.maxScore,
             percent: result.percent,
             durationMs: finished.submittedAt - finished.startedAt,
           }),
     )
-  }, [finished, result])
+  }, [finished, result, course.id, course.difficulty])
 
   // Ergebnisbild rendern (Locale- oder Theme-Wechsel rendert neu)
   useEffect(() => {
@@ -103,7 +105,7 @@ export function ResultScreen({ route, themePref }: Props) {
 
   const retry = () => {
     clearFinished()
-    navigate({ locale: route.locale, screen: 'quiz' })
+    navigate({ locale: route.locale, screen: 'quiz', courseId: course.id })
   }
 
   return (
@@ -129,8 +131,8 @@ export function ResultScreen({ route, themePref }: Props) {
             <dd>{date(card.at)}</dd>
           </div>
           <div>
-            <dt>{t('start.kicker')}</dt>
-            <dd>{t('card.topicLine', { topic: card.topic, difficulty: card.difficulty })}</dd>
+            <dt>{t('course.label')}</dt>
+            <dd>{t('card.topicLine', { segment: card.segment, course: card.courseTitle })}</dd>
           </div>
         </dl>
         <p className="notice" style={{ textAlign: 'left', marginTop: 12 }}>
@@ -202,8 +204,11 @@ export function ResultScreen({ route, themePref }: Props) {
         <button type="button" className="btn btn-primary" onClick={retry}>
           {t('result.retry')}
         </button>
-        <a className="btn btn-secondary" href={hashFor({ locale: route.locale, screen: 'learn' })}>
+        <a className="btn btn-secondary" href={hashFor({ locale: route.locale, screen: 'learn', courseId: course.id })}>
           {t('result.toLearn')}
+        </a>
+        <a className="btn btn-tertiary" href={hashFor({ locale: route.locale, screen: 'overview', courseId: course.id })}>
+          {t('course.backToOverview')}
         </a>
       </div>
     </div>

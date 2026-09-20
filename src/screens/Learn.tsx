@@ -1,24 +1,23 @@
 import { useEffect, useState } from 'react'
 import { hashFor } from '../app/router'
-import type { Route } from '../app/router'
+import type { CourseRoute } from '../app/router'
 import { Progress } from '../components/Progress'
-import { CARDS } from '../content/e-invoicing/cards'
-import { FormatsFigure } from '../content/e-invoicing/svgs/Formats'
-import { ProcessFigure } from '../content/e-invoicing/svgs/Process'
-import { TimelineFigure } from '../content/e-invoicing/svgs/Timeline'
+import type { Course } from '../content/types'
 import { useI18n } from '../i18n/t'
-import { updateHistory } from '../state/localHistory'
+import { markLearnDone, updateHistory } from '../state/localHistory'
 
-export function LearnScreen({ route }: { route: Route }) {
+export function LearnScreen({ route, course }: { route: CourseRoute; course: Course }) {
   const { t, lt, num } = useI18n()
   const [i, setI] = useState(0)
-  const card = CARDS[i] ?? CARDS[0]!
-  const total = CARDS.length
+  const cards = course.cards
+  const card = cards[i] ?? cards[0]!
+  const total = cards.length
   const isLast = i === total - 1
+  const Figure = card.figure ? course.figures[card.figure] : undefined
 
   useEffect(() => {
-    if (isLast) updateHistory((h) => (h.learnCardsSeen ? h : { ...h, learnCardsSeen: true }))
-  }, [isLast])
+    if (isLast) updateHistory((h) => markLearnDone(h, course.id))
+  }, [isLast, course.id])
 
   useEffect(() => {
     document.getElementById('learn-title')?.focus()
@@ -34,11 +33,9 @@ export function LearnScreen({ route }: { route: Route }) {
             {lt(card.title)}
           </h1>
         </div>
-        {card.figure ? (
+        {Figure ? (
           <div className="learn-figure">
-            {card.figure === 'process' ? <ProcessFigure /> : null}
-            {card.figure === 'formats' ? <FormatsFigure /> : null}
-            {card.figure === 'timeline' ? <TimelineFigure /> : null}
+            <Figure />
           </div>
         ) : null}
         <div className="learn-text">
@@ -54,7 +51,7 @@ export function LearnScreen({ route }: { route: Route }) {
           {t('learn.prev')}
         </button>
         {isLast ? (
-          <a className="btn btn-primary" href={hashFor({ locale: route.locale, screen: 'quiz' })}>
+          <a className="btn btn-primary" href={hashFor({ locale: route.locale, screen: 'quiz', courseId: course.id })}>
             {t('learn.toQuiz')}
           </a>
         ) : (
@@ -65,7 +62,7 @@ export function LearnScreen({ route }: { route: Route }) {
       </div>
       {!isLast ? (
         <p className="small" style={{ textAlign: 'center' }}>
-          <a href={hashFor({ locale: route.locale, screen: 'quiz' })}>{t('learn.skip')}</a>
+          <a href={hashFor({ locale: route.locale, screen: 'quiz', courseId: course.id })}>{t('learn.skip')}</a>
         </p>
       ) : null}
     </div>
