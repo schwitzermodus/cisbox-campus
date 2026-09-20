@@ -1,6 +1,6 @@
 import { useId } from 'react'
-import { useNarrow } from '../../../app/useNarrow'
-import { useI18n } from '../../../i18n/t'
+import { useNarrow } from '../../../../app/useNarrow'
+import { useI18n } from '../../../../i18n/t'
 
 const WARN = 'var(--ds-text-status-warning-primary, #9e6c00)'
 const BRAND = 'var(--cc-brand-text, #1a8242)'

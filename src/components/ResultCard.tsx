@@ -13,7 +13,7 @@ export function ResultCard({ data }: { data: CardData }) {
         <img src={LOGO} alt="" width={24} height={24} />
         <span>{t('card.brand')}</span>
       </div>
-      <div className="rc-topic">{t('card.topicLine', { topic: data.topic, difficulty: data.difficulty })}</div>
+      <div className="rc-topic">{t('card.topicLine', { segment: data.segment, course: data.courseTitle })}</div>
       <div className="rc-score">
         <span className="rc-num">{num(data.score)}</span>
         <span className="rc-of">

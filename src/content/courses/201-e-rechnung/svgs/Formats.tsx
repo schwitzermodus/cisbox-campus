@@ -1,6 +1,6 @@
 import { useId } from 'react'
-import { useNarrow } from '../../../app/useNarrow'
-import { useI18n } from '../../../i18n/t'
+import { useNarrow } from '../../../../app/useNarrow'
+import { useI18n } from '../../../../i18n/t'
 
 const LEAVES = ['XRechnung', 'ZUGFeRD/Factur-X', 'Peppol BIS', 'EHF']
 const LEAF_BG = 'var(--ds-background-element-dim-green-secondary, #e6f6eb)'

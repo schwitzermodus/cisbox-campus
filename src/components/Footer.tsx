@@ -27,7 +27,7 @@ export function Footer({ route }: { route: Route }) {
   return (
     <footer className="footer">
       <div className="footer-inner">
-        <a href={hashFor({ locale: route.locale, screen: 'privacy' })}>{t('privacy.title')}</a>
+        <a href={hashFor({ locale: route.locale, screen: 'privacy' as const })}>{t('privacy.title')}</a>
         {version ? <span className="footer-version">{version}</span> : null}
       </div>
     </footer>

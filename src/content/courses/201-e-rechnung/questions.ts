@@ -1,9 +1,9 @@
-import type { LocalizedText, Question } from '../../core/types'
-import { DIFFICULTY, TOPIC } from './meta'
+import type { LocalizedText, Question } from '../../../core/types'
+import { DIFFICULTY } from './meta'
 
 const t = (de: string, en: string): LocalizedText => ({ de, en })
 const opt = (id: string, de: string, en: string) => ({ id, label: t(de, en) })
-const base = { topic: TOPIC, difficulty: DIFFICULTY } as const
+const base = { difficulty: DIFFICULTY } as const
 
 /**
  * Fragenpool E-Rechnung, Schwierigkeit Basis: 15 Single, 5 Multi, 3 Slider, 2 Zuordnung.

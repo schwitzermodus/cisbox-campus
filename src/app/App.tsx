@@ -1,17 +1,19 @@
 import { useEffect, useMemo, useState } from 'react'
+import { courseById } from '../content/registry'
 import { I18nContext, makeI18n } from '../i18n/t'
 import { updateHistory } from '../state/localHistory'
 import type { ThemePreference } from '../state/localHistory'
 import { applyTheme, readThemePreference, saveThemePreference, watchSystemTheme } from '../state/theme'
 import { Header } from '../components/Header'
 import { Footer } from '../components/Footer'
-import { StartScreen } from '../screens/Start'
+import { CoursesScreen } from '../screens/Courses'
+import { CourseOverviewScreen } from '../screens/CourseOverview'
 import { LearnScreen } from '../screens/Learn'
 import { QuizScreen } from '../screens/Quiz'
 import { ResultScreen } from '../screens/Result'
 import { PrivacyScreen } from '../screens/Privacy'
 import { ErrorBoundary } from './ErrorBoundary'
-import { useRoute } from './router'
+import { isCourseRoute, navigate, useRoute } from './router'
 
 export function App() {
   const route = useRoute()
@@ -29,10 +31,18 @@ export function App() {
     return watchSystemTheme(() => themePref, () => {})
   }, [themePref])
 
-  // Beim Screen-Wechsel nach oben, Fokus auf den Inhalt
+  const courseId = isCourseRoute(route) ? route.courseId : null
+  const course = courseId ? courseById(courseId) : null
+
+  // Unbekannte (noch nicht angelegte) Kurs-ID: zurueck auf die Uebersicht statt Absturz.
+  useEffect(() => {
+    if (courseId && !course) navigate({ locale: route.locale, screen: 'courses' })
+  }, [courseId, course, route.locale])
+
+  // Beim Screen- oder Kurswechsel nach oben
   useEffect(() => {
     window.scrollTo({ top: 0 })
-  }, [route.screen])
+  }, [route.screen, courseId])
 
   const onTheme = (p: ThemePreference) => {
     setThemePref(p)
@@ -40,22 +50,34 @@ export function App() {
   }
 
   let screen
-  switch (route.screen) {
-    case 'start':
-      screen = <StartScreen route={route} />
-      break
-    case 'learn':
-      screen = <LearnScreen route={route} />
-      break
-    case 'quiz':
-      screen = <QuizScreen route={route} />
-      break
-    case 'result':
-      screen = <ResultScreen route={route} themePref={themePref} />
-      break
-    case 'privacy':
-      screen = <PrivacyScreen route={route} />
-      break
+  if (isCourseRoute(route)) {
+    if (!course) {
+      screen = null
+    } else {
+      switch (route.screen) {
+        case 'overview':
+          screen = <CourseOverviewScreen route={route} course={course} />
+          break
+        case 'learn':
+          screen = <LearnScreen route={route} course={course} />
+          break
+        case 'quiz':
+          screen = <QuizScreen route={route} course={course} />
+          break
+        case 'result':
+          screen = <ResultScreen route={route} course={course} themePref={themePref} />
+          break
+      }
+    }
+  } else {
+    switch (route.screen) {
+      case 'courses':
+        screen = <CoursesScreen route={route} />
+        break
+      case 'privacy':
+        screen = <PrivacyScreen route={route} />
+        break
+    }
   }
 
   return (
@@ -65,7 +87,7 @@ export function App() {
       </a>
       <Header route={route} themePref={themePref} onTheme={onTheme} />
       <main id="main" className="main" tabIndex={-1}>
-        <ErrorBoundary key={route.screen}>{screen}</ErrorBoundary>
+        <ErrorBoundary key={route.screen + ':' + (courseId ?? '')}>{screen}</ErrorBoundary>
       </main>
       <Footer route={route} />
     </I18nContext.Provider>

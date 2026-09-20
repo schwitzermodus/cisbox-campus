@@ -1,9 +1,13 @@
+import { courseById, isCourseId } from '../content/registry'
+import type { CourseId } from '../content/types'
 import type { Answer, AnswerMap, Question } from '../core/types'
 
-export const SESSION_KEY = 'cisbox-campus.quiz.v1'
+/** Key-Bump statt Migration: eine Test-Sitzung ueberlebt nur den Tab, eine Migration lohnt nicht. */
+export const SESSION_KEY = 'cisbox-campus.quiz.v2'
 
 /** Laufender Test. Liegt in sessionStorage, damit ein Reload nichts verliert. */
 export type QuizSession = {
+  courseId: CourseId
   quizVersion: string
   startedAt: number
   questions: Question[]
@@ -24,17 +28,23 @@ function isSession(v: unknown): v is QuizSession {
   if (typeof v !== 'object' || v === null) return false
   const o = v as Record<string, unknown>
   return (
+    isCourseId(o.courseId) &&
     typeof o.quizVersion === 'string' &&
     typeof o.startedAt === 'number' &&
+    Number.isFinite(o.startedAt) &&
     Array.isArray(o.questions) &&
     o.questions.length > 0 &&
     typeof o.answers === 'object' &&
     o.answers !== null &&
-    typeof o.index === 'number'
+    typeof o.index === 'number' &&
+    Number.isInteger(o.index) &&
+    o.index >= 0 &&
+    o.index < o.questions.length
   )
 }
 
-export function readSession(): QuizSession | null {
+/** Session ohne Kursfilter: fuer den "woanders laeuft noch ein Test"-Hinweis. */
+export function peekSession(): QuizSession | null {
   const s = storage()
   if (!s) return null
   try {
@@ -45,6 +55,19 @@ export function readSession(): QuizSession | null {
   } catch {
     return null
   }
+}
+
+/**
+ * Session nur, wenn sie zu genau diesem Kurs UND der aktuellen Inhaltsversion gehoert.
+ * Sonst wuerde eine Session aus einem anderen Kurs (oder ein veraltetes Fragenset nach
+ * einem Content-Update) hier unbemerkt weiterlaufen.
+ */
+export function readSession(courseId: CourseId): QuizSession | null {
+  const s = peekSession()
+  if (!s || s.courseId !== courseId) return null
+  const course = courseById(courseId)
+  if (!course || s.quizVersion !== course.quizVersion) return null
+  return s
 }
 
 export function writeSession(session: QuizSession): void {
