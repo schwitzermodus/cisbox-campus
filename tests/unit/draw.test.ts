@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DRAW_MIX, QUESTIONS_PER_QUIZ, drawQuestions, shuffle } from '../../src/core/draw'
+import { DRAW_MIX, QUESTIONS_PER_QUIZ, drawQuestions, interleave, shuffle } from '../../src/core/draw'
 import type { Question } from '../../src/core/types'
 
 const base = { topic: 'e-invoicing', difficulty: 'basic', prompt: { de: 'p' }, explanation: { de: 'e' } } as const
@@ -28,7 +28,7 @@ function seeded(seed: number) {
 }
 
 describe('drawQuestions', () => {
-  it('zieht 10 Fragen im Mix 6/2/1/1, Zuordnung zuletzt', () => {
+  it('zieht 10 Fragen im Mix 4/3/2/1', () => {
     const set = drawQuestions(pool(), seeded(1))
     expect(set).toHaveLength(QUESTIONS_PER_QUIZ)
     expect(QUESTIONS_PER_QUIZ).toBe(10)
@@ -37,13 +37,28 @@ describe('drawQuestions', () => {
     expect(count('multi')).toBe(DRAW_MIX.multi)
     expect(count('slider')).toBe(DRAW_MIX.slider)
     expect(count('matching')).toBe(DRAW_MIX.matching)
-    expect(set[set.length - 1]?.type).toBe('matching')
     expect(new Set(set.map((q) => q.id)).size).toBe(10)
+  })
+  it('verwebt die Typen: nie zwei gleiche hintereinander, Zuordnung nicht zuerst', () => {
+    for (let seed = 1; seed <= 60; seed++) {
+      const set = drawQuestions(pool(), seeded(seed))
+      const types = set.map((q) => q.type)
+      const neighbours = types.slice(1).map((t, i) => t === types[i])
+      expect(neighbours.some(Boolean), 'seed ' + seed + ': ' + types.join(',')).toBe(false)
+      expect(types[0], 'seed ' + seed).not.toBe('matching')
+    }
   })
   it('zwei Ziehungen liefern nicht dasselbe Set', () => {
     const a = drawQuestions(pool(), seeded(7)).map((q) => q.id).join(',')
     const b = drawQuestions(pool(), seeded(99)).map((q) => q.id).join(',')
     expect(a).not.toBe(b)
+  })
+  it('die Abfolge der Typen variiert zwischen Ziehungen', () => {
+    const seen = new Set<string>()
+    for (let seed = 1; seed <= 30; seed++) {
+      seen.add(drawQuestions(pool(), seeded(seed)).map((q) => q.type).join(','))
+    }
+    expect(seen.size).toBeGreaterThan(1)
   })
   it('shuffelt Optionen, veraendert aber nicht die Originalfrage', () => {
     const p = pool()
@@ -54,6 +69,19 @@ describe('drawQuestions', () => {
   })
   it('wirft, wenn der Pool einen Typ nicht hergibt', () => {
     expect(() => drawQuestions(pool().filter((q) => q.type !== 'slider'), seeded(1))).toThrow(/slider/)
+  })
+})
+
+describe('interleave', () => {
+  it('behaelt alle Fragen und kommt mit einer einzigen Gruppe klar', () => {
+    const only = pool().filter((q) => q.type === 'single').slice(0, 3)
+    expect(interleave(only, seeded(1)).map((q) => q.id)).toEqual(only.map((q) => q.id))
+  })
+  it('verteilt auch eine dominante Gruppe ohne Nachbarschaft', () => {
+    const p = pool()
+    const mix = [...p.filter((q) => q.type === 'single').slice(0, 5), ...p.filter((q) => q.type === 'multi').slice(0, 5)]
+    const types = interleave(mix, seeded(4)).map((q) => q.type)
+    expect(types.slice(1).some((t, i) => t === types[i])).toBe(false)
   })
 })
 

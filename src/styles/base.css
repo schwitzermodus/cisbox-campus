@@ -7,14 +7,28 @@
   --cc-max: 720px;
   --cc-gutter: 16px;
   --cc-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --cc-focus: 0 0 0 3px var(--ds-border-brand-dim-primary, #c6eac7), 0 0 0 1px var(--ds-border-brand-primary);
+  --cc-focus: 0 0 0 3px var(--ds-border-brand-dim-primary, #c6eac7), 0 0 0 1px var(--cc-brand-line);
   --cc-brand-text: var(--ds-text-brand-primary);
+  /* Flaechen-Hierarchie: Seite < Karte, dazwischen eingelassene Blöcke.
+     body-tertiary ist der einzige Token, der in BEIDEN Themes als erhoehte Flaeche traegt
+     (light #ffffff, dark #2a2a2a). */
+  --cc-surface-page: var(--ds-background-element-neutral-tertiary);
+  --cc-surface-card: var(--ds-background-body-tertiary);
+  --cc-surface-inset: var(--ds-background-element-neutral-secondary);
+  --cc-border: var(--ds-border-neutral-secondary);
+  --cc-border-strong: var(--ds-border-neutral-tertiary);
+  --cc-brand-line: var(--ds-border-brand-primary);
   color-scheme: light;
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
   --cc-brand-text: var(--ds-text-brand-secondary);
   --cc-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  /* dark: Seite #111111, Karte #2a2a2a, eingelassen #191919 */
+  --cc-surface-page: var(--ds-background-body-primary);
+  --cc-surface-card: var(--ds-background-element-neutral-tertiary);
+  --cc-surface-inset: var(--ds-background-body-secondary);
+  --cc-brand-line: var(--ds-border-brand-secondary);
 }
 
 *,
@@ -34,7 +48,7 @@ body {
   font-family: var(--cc-font);
   line-height: 1.5;
   color: var(--ds-text-neutral-primary);
-  background: var(--ds-background-body-secondary);
+  background: var(--cc-surface-page);
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -105,8 +119,8 @@ a {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--ds-background-body-primary);
-  border-bottom: 1px solid var(--ds-border-neutral-primary);
+  background: var(--cc-surface-card);
+  border-bottom: 1px solid var(--cc-border);
 }
 .header-inner {
   max-width: var(--cc-max);
@@ -143,7 +157,7 @@ a {
 
 .seg {
   display: inline-flex;
-  border: 1px solid var(--ds-border-neutral-secondary);
+  border: 1px solid var(--cc-border);
   border-radius: var(--cc-radius);
   overflow: hidden;
   background: var(--ds-background-element-neutral-primary);
@@ -170,7 +184,7 @@ a {
 }
 .seg button:focus-visible {
   border-radius: 0;
-  box-shadow: inset 0 0 0 2px var(--ds-border-brand-secondary);
+  box-shadow: inset 0 0 0 2px var(--cc-brand-line);
 }
 
 .select {
@@ -179,9 +193,9 @@ a {
   font-size: 0.875rem;
   min-height: 40px;
   padding: 0 32px 0 10px;
-  border: 1px solid var(--ds-border-neutral-secondary);
+  border: 1px solid var(--cc-border);
   border-radius: var(--cc-radius);
-  background: var(--ds-background-body-primary)
+  background: var(--cc-surface-card)
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23838383' stroke-width='1.6'/></svg>")
     no-repeat right 10px center;
   color: var(--ds-text-neutral-primary);
@@ -206,10 +220,11 @@ a {
 }
 
 .card {
-  background: var(--ds-background-body-primary);
-  border: 1px solid var(--ds-border-neutral-primary);
+  background: var(--cc-surface-card);
+  border: 1px solid var(--cc-border);
   border-radius: var(--cc-radius-lg);
   padding: 20px;
+  box-shadow: var(--cc-shadow);
 }
 @media (min-width: 640px) {
   .card {
@@ -277,7 +292,7 @@ a {
 .btn-secondary {
   background: var(--ds-background-element-neutral-primary);
   color: var(--cc-brand-text);
-  border-color: var(--ds-border-brand-primary);
+  border-color: var(--cc-brand-line);
 }
 .btn-secondary:hover:not(:disabled) {
   background: var(--ds-background-element-dim-brand-primary, var(--ds-background-element-dim-green-primary));
@@ -384,16 +399,16 @@ legend {
   gap: 12px;
   min-height: 48px;
   padding: 12px 14px;
-  border: 1px solid var(--ds-border-neutral-secondary);
+  border: 1px solid var(--cc-border);
   border-radius: var(--cc-radius);
-  background: var(--ds-background-body-primary);
+  background: var(--cc-surface-inset);
   cursor: pointer;
 }
 .option:hover {
   background: var(--ds-background-element-neutral-alpha-primary);
 }
 .option:has(input:checked) {
-  border-color: var(--ds-border-brand-primary);
+  border-color: var(--cc-brand-line);
   background: var(--ds-background-element-dim-green-primary);
 }
 .option:has(input:focus-visible) {
@@ -446,14 +461,14 @@ legend {
   width: 100%;
   max-width: 220px;
   padding: 8px 12px;
-  border: 1px solid var(--ds-border-neutral-secondary);
+  border: 1px solid var(--cc-border);
   border-radius: var(--cc-radius);
-  background: var(--ds-background-body-primary);
+  background: var(--cc-surface-inset);
   color: var(--ds-text-neutral-primary);
 }
 .num-input:focus {
-  border-color: var(--ds-border-brand-primary);
-  box-shadow: 0 0 0 1px var(--ds-border-brand-primary);
+  border-color: var(--cc-brand-line);
+  box-shadow: 0 0 0 1px var(--cc-brand-line);
   outline: none;
 }
 
@@ -470,9 +485,9 @@ legend {
   grid-template-columns: 1fr;
   gap: 6px;
   padding: 10px 12px;
-  border: 1px solid var(--ds-border-neutral-primary);
+  border: 1px solid var(--cc-border);
   border-radius: var(--cc-radius);
-  background: var(--ds-background-body-primary);
+  background: var(--cc-surface-inset);
 }
 @media (min-width: 480px) {
   .match-row {
@@ -489,41 +504,60 @@ legend {
   min-height: 44px;
 }
 
-/* Fragen-Navigation (Punkte) */
-.dots {
+/* Fragen-Navigation: eine Leiste, die Fortschritt zeigt UND Spruenge erlaubt.
+   Ersetzt den frueheren Fortschrittsbalken plus die Punktliste unter den Buttons. */
+.qnav {
   display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+}
+.qnav-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--ds-text-neutral-secondary);
+}
+.qnav-label b {
+  color: var(--ds-text-neutral-primary);
+}
+.qnav-segs {
+  display: flex;
+  gap: 4px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
-.dot {
+.qnav-segs li {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.qnav-seg {
   appearance: none;
-  width: 29px;
-  height: 29px;
-  border-radius: 50%;
-  border: 1px solid var(--ds-border-neutral-secondary);
-  background: var(--ds-background-body-primary);
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 0;
+  border-radius: var(--cc-radius);
+  border: 1px solid var(--cc-border);
+  background: var(--cc-surface-inset);
   color: var(--ds-text-neutral-secondary);
   font: inherit;
   font-size: 0.75rem;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
   cursor: pointer;
+  transition: background-color 0.15s ease;
 }
-.dot[data-answered="true"] {
+.qnav-seg[data-answered="true"] {
   background: var(--ds-background-element-dim-green-secondary);
-  border-color: var(--ds-border-brand-dim-primary, #c6eac7);
+  border-color: var(--cc-brand-line);
   color: var(--cc-brand-text);
 }
-.dot[aria-current="step"] {
+.qnav-seg[aria-current="step"] {
   background: var(--ds-background-element-brand-primary);
   border-color: var(--ds-background-element-brand-primary);
   color: var(--ds-text-neutral-inverse-primary);
-}
-.dot:focus-visible {
-  border-radius: 50%;
 }
 
 .quiz-nav {
@@ -537,11 +571,11 @@ legend {
 
 /* ---------- Dialog ---------- */
 .dialog {
-  border: 1px solid var(--ds-border-neutral-primary);
+  border: 1px solid var(--cc-border-strong);
   border-radius: 8px;
   padding: 24px;
   max-width: min(480px, calc(100vw - 32px));
-  background: var(--ds-background-body-primary);
+  background: var(--cc-surface-card);
   color: var(--ds-text-neutral-primary);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
@@ -562,26 +596,59 @@ legend {
 }
 
 /* ---------- Lernkarten ---------- */
+/* Drei Zonen je Karte: Kopf, Grafik, Text. */
+.learn-card {
+  padding: 0;
+  overflow: hidden;
+}
+.learn-head {
+  padding: 20px;
+  border-bottom: 1px solid var(--cc-border);
+}
+.learn-head h1 {
+  margin-bottom: 0;
+}
+.learn-figure {
+  padding: 16px;
+  background: var(--cc-surface-inset);
+  border-bottom: 1px solid var(--cc-border);
+}
+.learn-text {
+  padding: 20px;
+}
 .learn-body {
   font-size: 1.0625rem;
-  line-height: 1.6;
+  line-height: 1.65;
+  margin: 0;
+}
+.learn-body + .learn-body {
+  margin-top: 14px;
+}
+@media (min-width: 640px) {
+  .learn-head,
+  .learn-text {
+    padding: 24px;
+  }
+  .learn-figure {
+    padding: 20px 24px;
+  }
 }
 .figure {
   width: 100%;
   height: auto;
   display: block;
-  margin: 12px 0 4px;
+  margin: 0;
   color: var(--ds-text-neutral-primary);
 }
 .figure text {
   font-family: var(--cc-font);
 }
+/* Rechtsstand: steht ausschliesslich auf der Startseite. */
 .asof {
   font-size: 0.8125rem;
   color: var(--ds-text-neutral-secondary);
-  border-top: 1px solid var(--ds-border-neutral-primary);
-  padding-top: 10px;
-  margin-top: 16px;
+  text-align: center;
+  margin: 0;
 }
 
 /* ---------- Ergebnis ---------- */
@@ -634,8 +701,8 @@ legend {
   aspect-ratio: 1200 / 630;
   width: 100%;
   border-radius: var(--cc-radius-lg);
-  border: 1px solid var(--ds-border-neutral-primary);
-  background: var(--ds-background-body-primary);
+  border: 1px solid var(--cc-border);
+  background: var(--cc-surface-card);
   display: block;
 }
 .card-preview[hidden] {
@@ -652,9 +719,10 @@ legend {
 }
 .bd-item {
   padding: 14px 16px;
-  border: 1px solid var(--ds-border-neutral-primary);
+  border: 1px solid var(--cc-border);
   border-radius: var(--cc-radius-lg);
-  background: var(--ds-background-body-primary);
+  background: var(--cc-surface-card);
+  box-shadow: var(--cc-shadow);
 }
 .bd-head {
   display: flex;
@@ -762,8 +830,8 @@ legend {
 
 /* ---------- Footer ---------- */
 .footer {
-  border-top: 1px solid var(--ds-border-neutral-primary);
-  background: var(--ds-background-body-primary);
+  border-top: 1px solid var(--cc-border);
+  background: var(--cc-surface-card);
 }
 .footer-inner {
   max-width: var(--cc-max);
@@ -778,14 +846,14 @@ legend {
 .footer a {
   color: var(--ds-text-neutral-secondary);
 }
+/* Das Original-Element in index.html traegt nur den vom pre-commit-Hook gepflegten Wert.
+   Angezeigt wird die Version im Footer (siehe components/Footer.tsx). */
 .app-version {
-  position: fixed;
-  left: 8px;
-  bottom: 4px;
-  font-size: 11px;
-  color: var(--ds-text-neutral-secondary);
-  pointer-events: none;
-  font-family: var(--cc-font);
+  display: none;
+}
+.footer-version {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -850,7 +918,7 @@ legend {
   gap: 4cqw;
   color: var(--ds-text-neutral-secondary);
   font-size: 2.6cqw;
-  border-top: 1px solid var(--ds-border-neutral-primary);
+  border-top: 1px solid var(--cc-border);
   padding-top: 2cqw;
 }
 .rc-foot {

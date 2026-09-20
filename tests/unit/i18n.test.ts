@@ -42,7 +42,8 @@ describe('UI-Messages', () => {
 function collectTexts(): { where: string; text: LocalizedText }[] {
   const out: { where: string; text: LocalizedText }[] = []
   for (const c of CARDS) {
-    out.push({ where: `${c.id}.title`, text: c.title }, { where: `${c.id}.body`, text: c.body })
+    out.push({ where: `${c.id}.title`, text: c.title })
+    c.body.forEach((p, i) => out.push({ where: `${c.id}.body[${i}]`, text: p }))
   }
   for (const q of QUESTIONS) {
     out.push({ where: `${q.id}.prompt`, text: q.prompt }, { where: `${q.id}.explanation`, text: q.explanation })
@@ -100,7 +101,22 @@ describe('Fachinhalt', () => {
       }
     }
   })
-  it('9 Lernkarten mit eindeutigen IDs', () => {
+  it('Lernkarten-Absaetze sind sauber geschnitten (kein Bruch mitten im Satz)', () => {
+    for (const c of CARDS) {
+      expect(c.body.length, c.id).toBeGreaterThanOrEqual(2)
+      for (const [i, p] of c.body.entries()) {
+        for (const locale of ['de', 'en'] as const) {
+          const text = (p[locale] ?? '').trim()
+          expect(text.length, `${c.id}.body[${i}].${locale}`).toBeGreaterThan(0)
+          // Absatz startet mit Grossbuchstabe oder oeffnendem Anfuehrungszeichen ...
+          expect(text[0], `${c.id}.body[${i}].${locale} Anfang: ${text.slice(0, 40)}`).toMatch(/[A-ZÄÖÜ„“"]/)
+          // ... und endet mit einem Satzzeichen (faengt Schnitte in Datumsangaben wie "1. Januar")
+          expect(text.slice(-1), `${c.id}.body[${i}].${locale} Ende: ${text.slice(-40)}`).toMatch(/[.!?“"]/)
+        }
+      }
+    }
+  })
+    it('9 Lernkarten mit eindeutigen IDs', () => {
     expect(CARDS).toHaveLength(9)
     expect(new Set(CARDS.map((c) => c.id)).size).toBe(9)
   })
