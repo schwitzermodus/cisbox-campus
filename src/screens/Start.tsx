@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { hashFor } from '../app/router'
+import { CONTENT_AS_OF } from '../content/e-invoicing/meta'
 import type { Route } from '../app/router'
 import { useI18n } from '../i18n/t'
 import { bestAttempt, lastAttempt, readHistory } from '../state/localHistory'
@@ -7,7 +8,7 @@ import type { Attempt } from '../state/localHistory'
 import { readSession } from '../state/quizSession'
 
 export function StartScreen({ route }: { route: Route }) {
-  const { t, num, date } = useI18n()
+  const { t, num, date, isoDate } = useI18n()
   // localStorage erst nach dem Mount lesen (kein Zugriff waehrend des ersten Renders)
   const [last, setLast] = useState<Attempt | undefined>()
   const [best, setBest] = useState<Attempt | undefined>()
@@ -79,6 +80,8 @@ export function StartScreen({ route }: { route: Route }) {
           </p>
         </section>
       ) : null}
+
+      <p className="asof">{t('common.asOf', { date: isoDate(CONTENT_AS_OF) })}</p>
     </div>
   )
 }

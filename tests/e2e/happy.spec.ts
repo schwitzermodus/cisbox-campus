@@ -33,6 +33,8 @@ test('Happy Path: Start -> Test -> Ergebnis -> Bestleistung auf Start', async ({
   await expect(page).toHaveURL(/#\/(de|en)\/start$/)
   await page.goto('./#/de/start')
   await expect(page.getByRole('heading', { level: 1, name: 'E-Rechnung' })).toBeVisible()
+  // Rechtsstand steht nur hier, auf der Startseite
+  await expect(page.getByText(/Rechtsstand/)).toBeVisible()
   // Kein Verlauf: keine Ergebnis-Box
   await expect(page.getByText('Dein letztes Ergebnis')).toHaveCount(0)
   await expectNoAxeViolations(page)
@@ -52,13 +54,18 @@ test('Happy Path: Start -> Test -> Ergebnis -> Bestleistung auf Start', async ({
   await page.getByRole('button', { name: 'Deutsch' }).click()
   await expect(page.locator('section.card legend')).toHaveText(firstPrompt)
 
+  const seenTypes: string[] = []
   for (let i = 0; i < 10; i++) {
     await expect(page.getByText(`Frage ${i + 1} von 10`, { exact: true })).toBeVisible()
+    seenTypes.push(await page.locator('section.card .type-badge').innerText())
     await answerCurrent(page)
     if (i < 9) await page.getByRole('button', { name: 'Weiter' }).click()
   }
-  // Zuordnung kommt zuletzt
-  await expect(page.getByText('Zuordnung', { exact: true })).toBeVisible()
+  // Verwoben: nie zwei gleiche Fragetypen hintereinander
+  expect(seenTypes.slice(1).filter((x, k) => x === seenTypes[k])).toEqual([])
+  // Genau eine Zuordnung im Set (Position variiert durch das Verweben der Typen)
+  expect(seenTypes.filter((x) => x === 'Zuordnung')).toHaveLength(1)
+  expect(seenTypes.filter((x) => x === 'Schätzfrage')).toHaveLength(2)
 
   await page.getByRole('button', { name: 'Abgeben', exact: true }).click()
   const dialog = page.getByRole('dialog')
@@ -107,7 +114,10 @@ test('Manipulierter localStorage fuehrt nicht zum Absturz', async ({ page }) => 
 test('Kein horizontales Scrollen bei 360px, Lernkarten mit Grafik', async ({ page }) => {
   await page.goto('./#/de/learn')
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-  await expect(page.getByText('Rechtsstand:')).toBeVisible()
+  // Rechtsstand steht NICHT mehr auf der Lernkarte
+  await expect(page.getByText(/Rechtsstand/)).toHaveCount(0)
+  // Text ist in Absaetze unterteilt
+  expect(await page.locator('.learn-text .learn-body').count()).toBeGreaterThanOrEqual(2)
   for (let i = 0; i < 8; i++) await page.getByRole('button', { name: 'Weiter' }).click()
   await expect(page.getByRole('link', { name: 'Zum Test' })).toBeVisible()
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)

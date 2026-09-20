@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { navigate } from '../app/router'
 import type { Route } from '../app/router'
-import { Progress } from '../components/Progress'
+import { QuestionNav } from '../components/QuestionNav'
 import { MatchingQuestionView } from '../components/questions/Matching'
 import { MultiQuestion } from '../components/questions/Multi'
 import { SingleQuestion } from '../components/questions/Single'
@@ -86,11 +86,11 @@ export function QuizScreen({ route }: { route: Route }) {
       <h1 ref={headingRef} tabIndex={-1} className="vh">
         {t('quiz.title')}: {t('quiz.progress', { n: num(session.index + 1), total: num(total) })}
       </h1>
-      <Progress
-        value={session.index + 1}
-        max={total}
-        label={t('quiz.progress', { n: num(session.index + 1), total: num(total) })}
-        right={num(total - open) + '/' + num(total)}
+      <QuestionNav
+        total={total}
+        index={session.index}
+        answered={session.questions.map((qq) => isAnswered(session.answers[qq.id]))}
+        onJump={go}
       />
       <section className="card" key={q.id}>
         {view}
@@ -109,33 +109,6 @@ export function QuizScreen({ route }: { route: Route }) {
           </button>
         )}
       </div>
-      <ol className="dots" aria-label={t('quiz.title')}>
-        {session.questions.map((qq, i) => (
-          <li key={qq.id}>
-            <button
-              type="button"
-              className="dot"
-              data-answered={isAnswered(session.answers[qq.id]) ? 'true' : 'false'}
-              aria-current={i === session.index ? 'step' : undefined}
-              aria-label={
-                t('quiz.jumpTo', { n: num(i + 1) }) +
-                ', ' +
-                (isAnswered(session.answers[qq.id]) ? t('quiz.answeredState') : t('quiz.unansweredState'))
-              }
-              onClick={() => go(i)}
-            >
-              {num(i + 1)}
-            </button>
-          </li>
-        ))}
-      </ol>
-      {!isLast ? (
-        <p className="small" style={{ textAlign: 'center' }}>
-          <button type="button" className="btn btn-tertiary" onClick={() => dialogRef.current?.showModal()}>
-            {t('quiz.submit')}
-          </button>
-        </p>
-      ) : null}
 
       <dialog ref={dialogRef} className="dialog" aria-labelledby="confirm-h">
         <h2 id="confirm-h">{t('quiz.confirmTitle')}</h2>
