@@ -417,6 +417,7 @@ legend {
 }
 .option {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 12px;
   min-height: 48px;
@@ -444,7 +445,9 @@ legend {
   accent-color: var(--ds-background-element-brand-primary);
 }
 .option-text {
-  flex: 1;
+  flex: 1 1 8rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 /* Sofort-Feedback: Marken an Optionen und Zeilen, Feedback-Block unter der Frage */
@@ -468,6 +471,8 @@ fieldset:disabled .slider-value {
 }
 .mark {
   flex: none;
+  max-width: 100%;
+  margin-left: 30px;
   align-self: center;
   font-size: 0.8125rem;
   font-weight: 600;
