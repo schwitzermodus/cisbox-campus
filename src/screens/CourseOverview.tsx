@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { hashFor } from '../app/router'
 import type { CourseRoute } from '../app/router'
 import { courseById, segmentById } from '../content/registry'
@@ -11,13 +11,9 @@ import { readSession } from '../state/quizSession'
 
 export function CourseOverviewScreen({ route, course }: { route: CourseRoute; course: Course }) {
   const { t, lt, num, date, isoDate } = useI18n()
-  const [history, setHistory] = useState<LocalHistory | null>(null)
-  const [resumable, setResumable] = useState(false)
-
-  useEffect(() => {
-    setHistory(readHistory())
-    setResumable(readSession(course.id) !== null)
-  }, [course.id])
+  // Einmalig beim Mount lesen; App.tsx setzt key={course.id}, damit ein Kurswechsel neu initialisiert
+  const [history] = useState<LocalHistory | null>(readHistory)
+  const [resumable] = useState(() => readSession(course.id) !== null)
 
   const segment = segmentById(course.segment)
   const prereq = course.recommendedAfter ? courseById(course.recommendedAfter) : undefined

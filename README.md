@@ -70,5 +70,5 @@ Alle Lernkarten und Fragen stehen unter fachlichem Review (Sascha). Besonders zu
 ## Deployment
 
 Push auf `main` -> `.github/workflows/deploy.yml` baut und veröffentlicht auf GitHub Pages.
-Der pre-commit-Hook (`git config core.hooksPath .githooks`) bumpt die Versionsanzeige `vYYYY-MM-DD.N`
-in `index.html`; die QA prüft, dass sie sich pro Push ändert.
+Die Versionsanzeige im Footer (`vYYYY-MM-DD-<Commit-Kurzhash>`) wird beim Build automatisch erzeugt
+(`vite.config.ts`); daran ist erkennbar, welcher Stand live ist.

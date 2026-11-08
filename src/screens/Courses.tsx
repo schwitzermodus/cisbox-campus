@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { hashFor } from '../app/router'
 import type { GlobalRoute } from '../app/router'
 import { CourseCard } from '../components/CourseCard'
@@ -12,14 +12,9 @@ import type { QuizSession } from '../state/quizSession'
 
 export function CoursesScreen({ route }: { route: GlobalRoute }) {
   const { t, lt } = useI18n()
-  // localStorage/sessionStorage erst nach dem Mount lesen (kein Zugriff waehrend des ersten Renders)
-  const [history, setHistory] = useState<LocalHistory | null>(null)
-  const [session, setSession] = useState<QuizSession | null>(null)
-
-  useEffect(() => {
-    setHistory(readHistory())
-    setSession(peekSession())
-  }, [])
+  // localStorage/sessionStorage einmalig beim Mount lesen (Zugriffe sind abgesichert, kein SSR)
+  const [history] = useState<LocalHistory | null>(readHistory)
+  const [session] = useState<QuizSession | null>(peekSession)
 
   // Naechster empfohlener Kurs: erster Kurs in Segment- und Kursreihenfolge, dessen Test noch nicht bestanden ist.
   const nextRecommended = history
