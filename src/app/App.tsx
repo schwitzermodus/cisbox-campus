@@ -56,7 +56,7 @@ export function App() {
     } else {
       switch (route.screen) {
         case 'overview':
-          screen = <CourseOverviewScreen route={route} course={course} />
+          screen = <CourseOverviewScreen key={course.id} route={route} course={course} />
           break
         case 'learn':
           screen = <LearnScreen route={route} course={course} />

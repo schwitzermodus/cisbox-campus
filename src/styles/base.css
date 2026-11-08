@@ -868,11 +868,6 @@ legend {
 .footer a {
   color: var(--ds-text-neutral-secondary);
 }
-/* Das Original-Element in index.html traegt nur den vom pre-commit-Hook gepflegten Wert.
-   Angezeigt wird die Version im Footer (siehe components/Footer.tsx). */
-.app-version {
-  display: none;
-}
 .footer-version {
   margin-left: auto;
   font-variant-numeric: tabular-nums;

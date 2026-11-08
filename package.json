@@ -10,7 +10,7 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "e2e": "playwright test",
-    "lint": "oxlint"
+    "lint": "oxlint --deny-warnings"
   },
   "dependencies": {
     "react": "^19.2.8",

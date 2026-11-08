@@ -18,7 +18,7 @@ export function Header({ route, themePref, onTheme }: Props) {
 
   const switchLocale = (locale: ActiveLocale) => {
     // Hash-Wechsel: kein Reload, Quiz-State bleibt (sessionStorage + React)
-    window.location.hash = hashFor(withLocale(route, locale))
+    window.location.assign(hashFor(withLocale(route, locale)))
   }
 
   return (

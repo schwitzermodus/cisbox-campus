@@ -8,7 +8,7 @@
       var parsed = JSON.parse(raw);
       if (parsed && (parsed.theme === 'light' || parsed.theme === 'dark')) pref = parsed.theme;
     }
-  } catch (e) { /* localStorage nicht verfuegbar: System-Theme */ }
+  } catch { /* localStorage nicht verfuegbar: System-Theme */ }
   var dark = pref === 'dark' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
 })();
