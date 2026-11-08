@@ -27,7 +27,19 @@ CI (`.github/workflows/qa.yml`) runs typecheck, lint, unit, build, e2e on push/P
 - Always work on your own branch (e.g. `feat/...`, `fix/...`, `chore/...`), one branch per task. Never commit or push directly to `main`; changes reach `main` only via pull request.
 - Before opening or updating a PR, run locally and make sure all pass: `npm run typecheck`, `npm run lint`, `npm test`, `npm run e2e`.
 - Subject-matter content (`src/content/courses/*/cards.ts`, `questions.ts`) may only be changed after asking first: Sascha reviews it for accuracy. Structural/technical changes elsewhere don't need this.
-- Shared agent config goes in `.claude/` (committed); personal settings stay in `.claude/settings.local.json` (gitignored).
+- Shared agent config goes in `.claude/` (committed); personal settings stay in `.claude/settings.local.json` (gitignored). `.claude/settings.json` denies force pushes, pushes to `main`, `git reset --hard` and `gh pr merge`: only Sascha merges PRs. `main` is also branch-protected on GitHub (PR + green QA required, admins included).
+
+## Agent team (`/feature <issue-nr>`)
+
+Subagents in `.claude/agents/`, orchestrated by the skill `.claude/skills/feature/SKILL.md`:
+
+1. `po` (read + `gh issue`): turns the issue into a user story (Als/moechte/damit), testable acceptance criteria, "Design" section, open questions; never invents subject-matter content. Label `status:refinement`. **Stops for Sascha's approval.**
+2. `architect` (read + `gh issue comment`): implementation plan as issue comment (files, steps, tests per criterion, risks, branch `feature/<nr>-<kurzname>`). Label `status:in-progress`.
+3. `developer` (edit): implements the plan on that branch, commits, never pushes.
+4. `qa` (edit `tests/` only): one test per acceptance criterion, runs typecheck/lint/test/e2e, reports per criterion.
+5. `reviewer` (read-only): findings by severity. Critical findings go back to developer, max. 2 rounds.
+
+Then the orchestrator pushes, opens a PR with `Closes #<nr>` and a summary per role, and sets `status:review`. Labels on the issue show the current phase (`status:refinement` -> `status:ready` -> `status:in-progress` -> `status:review`).
 
 ## Versioning / deploy
 
