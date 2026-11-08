@@ -41,6 +41,15 @@ Subagents in `.claude/agents/`, orchestrated by the skill `.claude/skills/featur
 
 Then the orchestrator pushes, opens a PR with `Closes #<nr>` and a summary per role, and sets `status:review`. Labels on the issue show the current phase (`status:refinement` -> `status:ready` -> `status:in-progress` -> `status:review`).
 
+### Before `/feature`: `/next`
+
+Skill `.claude/skills/next/SKILL.md` finds the next issue so Sascha only sets direction and goals:
+
+- `strategist` (read + `gh issue`/`gh label`): keeps goals in the issue labelled `strategie` ("Ziele und Richtung", editable in the browser, no repo file), ranks the backlog against them (labels `prio:1..3`), recommends the next issue, returns questions if context is missing.
+- `ideation` (read + `gh issue create`): proposes 3-5 small ideas tied to the goals, creates issues only for ideas Sascha approved. Never invents subject-matter content.
+
+Subagents cannot ask Sascha directly: they return a "Rueckfragen" section and the orchestrator asks. `/next` ends by starting `/feature <nr>` after Sascha agrees.
+
 ## Versioning / deploy
 
 - The app version is generated at build time in `vite.config.ts` as `vYYYY-MM-DD-<short commit hash>` (UTC build date; hash from `GITHUB_SHA` in CI, else `git rev-parse`, fallback `dev`) and injected as the global `__APP_VERSION__` (declared in `src/env.d.ts`). The footer shows it, so the live version is visible on the page. No hook, no version file to bump: nothing to conflict between parallel branches.
