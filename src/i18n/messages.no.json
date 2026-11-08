@@ -168,5 +168,13 @@
   "figure.profiles.basic": "",
   "figure.profiles.en16931": "",
   "figure.profiles.extended": "",
-  "figure.profiles.caption": ""
+  "figure.profiles.caption": "",
+  "quiz.check": "",
+  "quiz.feedbackTitle": "",
+  "quiz.explanation": "",
+  "quiz.yourValue": "",
+  "quiz.correctRange": "",
+  "quiz.markCorrect": "",
+  "quiz.markWrongChosen": "",
+  "quiz.markMissed": ""
 }

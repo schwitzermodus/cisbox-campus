@@ -13,6 +13,8 @@ export type QuizSession = {
   questions: Question[]
   answers: AnswerMap
   index: number
+  /** IDs der Fragen, deren Antwort per "Antwort pruefen" bestaetigt wurde (gesperrt, Feedback sichtbar). */
+  checked: string[]
 }
 
 function storage(): Storage | null {
@@ -24,7 +26,8 @@ function storage(): Storage | null {
   }
 }
 
-function isSession(v: unknown): v is QuizSession {
+/** Strukturpruefung; `checked` darf fehlen (alte Sessions) und wird in `normalize` bereinigt. */
+function isSession(v: unknown): v is Omit<QuizSession, 'checked'> & { checked?: unknown } {
   if (typeof v !== 'object' || v === null) return false
   const o = v as Record<string, unknown>
   return (
@@ -43,6 +46,12 @@ function isSession(v: unknown): v is QuizSession {
   )
 }
 
+/** Fehlendes oder kaputtes `checked` wird zu einer leeren Liste, nur Strings bleiben erhalten. */
+function normalize(v: Omit<QuizSession, 'checked'> & { checked?: unknown }): QuizSession {
+  const checked = Array.isArray(v.checked) ? v.checked.filter((x): x is string => typeof x === 'string') : []
+  return { ...v, checked }
+}
+
 /** Session ohne Kursfilter: fuer den "woanders laeuft noch ein Test"-Hinweis. */
 export function peekSession(): QuizSession | null {
   const s = storage()
@@ -51,7 +60,7 @@ export function peekSession(): QuizSession | null {
     const raw = s.getItem(SESSION_KEY)
     if (!raw) return null
     const v: unknown = JSON.parse(raw)
-    return isSession(v) ? v : null
+    return isSession(v) ? normalize(v) : null
   } catch {
     return null
   }
@@ -95,6 +104,15 @@ export function withAnswer(session: QuizSession, id: string, answer: Answer | un
   if (answer === undefined) delete answers[id]
   else answers[id] = answer
   return { ...session, answers }
+}
+
+export function withChecked(session: QuizSession, id: string): QuizSession {
+  if (session.checked.includes(id)) return session
+  return { ...session, checked: [...session.checked, id] }
+}
+
+export function isChecked(session: QuizSession, id: string): boolean {
+  return session.checked.includes(id)
 }
 
 export function unansweredCount(session: QuizSession): number {

@@ -168,5 +168,13 @@
   "figure.profiles.basic": "BASIC",
   "figure.profiles.en16931": "EN 16931",
   "figure.profiles.extended": "EXTENDED",
-  "figure.profiles.caption": "Steigender Detailgrad, das sichtbare PDF bleibt gleich."
+  "figure.profiles.caption": "Steigender Detailgrad, das sichtbare PDF bleibt gleich.",
+  "quiz.check": "Antwort prüfen",
+  "quiz.feedbackTitle": "Rückmeldung zur Antwort",
+  "quiz.explanation": "Erklärung",
+  "quiz.yourValue": "Dein Wert",
+  "quiz.correctRange": "von {from} bis {to}",
+  "quiz.markCorrect": "richtig",
+  "quiz.markWrongChosen": "falsch gewählt",
+  "quiz.markMissed": "richtig, nicht gewählt"
 }
