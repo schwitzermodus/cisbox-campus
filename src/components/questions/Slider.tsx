@@ -2,9 +2,17 @@ import { useId } from 'react'
 import type { Answer, SliderQuestion } from '../../core/types'
 import { useI18n } from '../../i18n/t'
 
-type Props = { question: SliderQuestion; answer: Answer | undefined; onChange: (a: Answer | undefined) => void }
+type Props = {
+  question: SliderQuestion
+  answer: Answer | undefined
+  onChange: (a: Answer | undefined) => void
+  /** Eingaben gesperrt (Antwort wurde geprueft). */
+  locked?: boolean
+  /** Marken je Option bzw. Zeile anzeigen. */
+  reveal?: boolean
+}
 
-export function SliderQuestionView({ question, answer, onChange }: Props) {
+export function SliderQuestionView({ question, answer, onChange, locked }: Props) {
   const { t, lt, num } = useI18n()
   const sliderId = useId()
   const inputId = useId()
@@ -25,7 +33,7 @@ export function SliderQuestionView({ question, answer, onChange }: Props) {
   const fmt = (n: number) => (unit ? t('result.sliderUnit', { value: num(n), unit }) : num(n))
 
   return (
-    <fieldset>
+    <fieldset disabled={locked}>
       <span className="type-badge">{t('type.slider')}</span>
       <legend>{lt(question.prompt)}</legend>
       <div className="slider-wrap">

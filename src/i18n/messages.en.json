@@ -168,5 +168,13 @@
   "figure.profiles.basic": "BASIC",
   "figure.profiles.en16931": "EN 16931",
   "figure.profiles.extended": "EXTENDED",
-  "figure.profiles.caption": "Increasing detail, the visible PDF stays the same."
+  "figure.profiles.caption": "Increasing detail, the visible PDF stays the same.",
+  "quiz.check": "Check answer",
+  "quiz.feedbackTitle": "Feedback on your answer",
+  "quiz.explanation": "Explanation",
+  "quiz.yourValue": "Your value",
+  "quiz.correctRange": "from {from} to {to}",
+  "quiz.markCorrect": "correct",
+  "quiz.markWrongChosen": "chosen wrongly",
+  "quiz.markMissed": "correct, not chosen"
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { hashFor, navigate } from '../app/router'
 import type { CourseRoute } from '../app/router'
+import { QuestionFeedback } from '../components/QuestionFeedback'
 import { QuestionNav } from '../components/QuestionNav'
 import { MatchingQuestionView } from '../components/questions/Matching'
 import { MultiQuestion } from '../components/questions/Multi'
@@ -14,10 +15,12 @@ import { useI18n } from '../i18n/t'
 import {
   clearSession,
   isAnswered,
+  isChecked,
   peekSession,
   readSession,
   unansweredCount,
   withAnswer,
+  withChecked,
   writeSession,
 } from '../state/quizSession'
 import type { QuizSession } from '../state/quizSession'
@@ -31,6 +34,7 @@ function newSession(course: Course): QuizSession {
     questions: drawQuestions(course.questions),
     answers: {},
     index: 0,
+    checked: [],
   }
 }
 
@@ -57,6 +61,7 @@ export function QuizScreen({ route, course }: { route: CourseRoute; course: Cour
   const [state, setState] = useState<QuizState>(() => initQuizState(course))
   const dialogRef = useRef<HTMLDialogElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
+  const forwardRef = useRef<HTMLButtonElement>(null)
 
   const discardForeign = () => {
     clearSession()
@@ -109,9 +114,16 @@ export function QuizScreen({ route, course }: { route: CourseRoute; course: Cour
   const q = session.questions[session.index]!
   const answer = session.answers[q.id]
   const open = unansweredCount(session)
+  const checked = isChecked(session, q.id)
 
   const go = (idx: number) => update({ ...session, index: Math.min(total - 1, Math.max(0, idx)) })
   const onAnswer = (a: Answer | undefined) => update(withAnswer(session, q.id, a))
+
+  const onCheck = () => {
+    update(withChecked(session, q.id))
+    // Der Pruefen-Button ist danach weg: Fokus gezielt auf den naechsten Schritt
+    forwardRef.current?.focus()
+  }
 
   const submit = () => {
     const submittedAt = Date.now()
@@ -131,16 +143,16 @@ export function QuizScreen({ route, course }: { route: CourseRoute; course: Cour
   let view
   switch (q.type) {
     case 'single':
-      view = <SingleQuestion question={q} answer={answer} onChange={onAnswer} />
+      view = <SingleQuestion question={q} answer={answer} onChange={onAnswer} locked={checked} reveal={checked} />
       break
     case 'multi':
-      view = <MultiQuestion question={q} answer={answer} onChange={onAnswer} />
+      view = <MultiQuestion question={q} answer={answer} onChange={onAnswer} locked={checked} reveal={checked} />
       break
     case 'slider':
-      view = <SliderQuestionView question={q} answer={answer} onChange={onAnswer} />
+      view = <SliderQuestionView question={q} answer={answer} onChange={onAnswer} locked={checked} />
       break
     case 'matching':
-      view = <MatchingQuestionView question={q} answer={answer} onChange={onAnswer} />
+      view = <MatchingQuestionView question={q} answer={answer} onChange={onAnswer} locked={checked} reveal={checked} />
       break
   }
 
@@ -159,17 +171,23 @@ export function QuizScreen({ route, course }: { route: CourseRoute; course: Cour
       />
       <section className="card" key={q.id}>
         {view}
+        {checked ? null : (
+          <button type="button" className="btn btn-secondary fb-check" onClick={onCheck} disabled={!isAnswered(answer)}>
+            {t('quiz.check')}
+          </button>
+        )}
+        <QuestionFeedback question={q} answer={answer} checked={checked} />
       </section>
       <div className="quiz-nav">
         <button type="button" className="btn btn-secondary" onClick={() => go(session.index - 1)} disabled={session.index === 0}>
           {t('quiz.prev')}
         </button>
         {isLast ? (
-          <button type="button" className="btn btn-primary" onClick={() => dialogRef.current?.showModal()}>
+          <button ref={forwardRef} type="button" className="btn btn-primary" onClick={() => dialogRef.current?.showModal()}>
             {t('quiz.submit')}
           </button>
         ) : (
-          <button type="button" className="btn btn-primary" onClick={() => go(session.index + 1)}>
+          <button ref={forwardRef} type="button" className="btn btn-primary" onClick={() => go(session.index + 1)}>
             {t('quiz.next')}
           </button>
         )}

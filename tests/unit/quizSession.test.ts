@@ -14,6 +14,7 @@ function session(over: Partial<QuizSession> = {}): QuizSession {
     questions: course.questions.slice(0, 10),
     answers: {},
     index: 0,
+    checked: [],
     ...over,
   }
 }
